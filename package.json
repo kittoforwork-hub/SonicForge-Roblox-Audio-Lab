@@ -1,0 +1,19 @@
+{
+  "name": "sonicforge-roblox-audio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@ffmpeg/ffmpeg": "0.12.15",
+    "@ffmpeg/util": "0.12.2"
+  },
+  "devDependencies": {
+    "vite": "8.3.5",
+    "wrangler": "4.154.0"
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10111a" />
+    <meta name="description" content="Prepare audio for Roblox: adjust speed and gain, export OGG, upload through Roblox Open Cloud, and track moderation status." />
+    <title>SonicForge — Roblox Audio Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="SonicForge home">
+          <span class="brand-mark"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M4 18h4l3-8 5 16 4-12 3 7h7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/></svg></span>
+          <span class="brand-name">sonicforge<span> / AUDIO LAB</span></span>
+        </a>
+        <div class="topbar-right"><span class="secure-dot"></span><span>LOCAL AUDIO PROCESSING</span><span class="top-divider"></span><a href="https://create.roblox.com/docs/cloud/guides/usage-assets" target="_blank" rel="noreferrer">ROBLOX OPEN CLOUD ↗</a></div>
+      </header>
+
+      <main id="top" class="shell">
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> AUDIO PREP STATION <span class="version-tag">V1.0</span></div>
+            <h1>Shape your sound.<br /><span>Ship it to Roblox.</span></h1>
+            <p>Adjust playback speed and loudness, export a Roblox-ready OGG, then upload and track the moderation result from one workspace.</p>
+            <div class="hero-points"><span><i>01</i> Process in your browser</span><span><i>02</i> Upload with Open Cloud</span><span><i>03</i> Track review status</span></div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orb orb-one"></div><div class="orb orb-two"></div>
+            <div class="wave-card"><div class="wave-card-top"><span>LIVE SIGNAL</span><span class="wave-badge">● READY</span></div><div class="waveform"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><div class="wave-card-bottom"><span>48 kHz TARGET</span><span>OGG / VORBIS</span></div></div>
+            <div class="floating-chip chip-speed"><span class="chip-icon">↗</span><span><small>SPEED</small><strong id="hero-speed">1.00×</strong></span></div>
+            <div class="floating-chip chip-gain"><span class="chip-icon gain-icon">⌁</span><span><small>GAIN</small><strong id="hero-gain">+0 dB</strong></span></div>
+          </div>
+        </section>
+
+        <section class="workflow-grid">
+          <div class="panel audio-panel">
+            <div class="panel-heading"><div><div class="step-label"><span>01</span> AUDIO WORKBENCH</div><h2>Prepare your audio</h2></div><span class="pill pill-muted">ON-DEVICE</span></div>
+            <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Choose an audio file or drop it here">
+              <input id="file-input" type="file" accept=".mp3,.ogg,.wav,.flac,audio/mpeg,audio/ogg,audio/wav,audio/flac" hidden />
+              <div class="upload-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 21V5m0 0-6 6m6-6 6 6M5 20v6h22v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <strong>Drop an audio file here</strong><span>or <u>browse files</u> from your device</span><small>MP3 · OGG · WAV · FLAC &nbsp; / &nbsp; Max 20 MB · Under 7 minutes</small>
+            </div>
+            <div id="file-summary" class="file-summary hidden">
+              <div class="file-type-icon">♫</div><div class="file-main"><strong id="file-name">audio.ogg</strong><span id="file-meta">Audio file · Checking metadata…</span></div><button id="remove-file" class="icon-button" aria-label="Remove file" title="Remove file">×</button>
+            </div>
+            <audio id="original-player" class="audio-player hidden" controls preload="metadata"></audio>
+
+            <div class="controls-block">
+              <div class="control-heading"><div><label for="speed-range">Playback speed</label><p>Changes duration and pitch together, so Roblox can reverse it.</p></div><div class="control-value"><strong id="speed-value">1.00×</strong><button id="speed-reset" class="mini-reset" type="button">RESET</button></div></div>
+              <input id="speed-range" class="range speed-range" type="range" min="0.50" max="2.00" step="0.05" value="1.00" />
+              <div class="range-labels"><span>0.50× SLOWER</span><span>1.00× ORIGINAL</span><span>2.00× FASTER</span></div>
+            </div>
+            <div class="controls-block gain-block">
+              <div class="control-heading"><div><label for="gain-range">Loudness / gain</label><p>Adjust output level in decibels. Positive gain may trigger a limiter.</p></div><div class="control-value"><strong id="gain-value">+0 dB</strong><button id="gain-reset" class="mini-reset" type="button">RESET</button></div></div>
+              <input id="gain-range" class="range gain-range" type="range" min="-12" max="12" step="1" value="0" />
+              <div class="range-labels"><span>−12 dB</span><span>0 dB · NO GAIN</span><span>+12 dB</span></div>
+            </div>
+            <div class="restore-card"><div class="restore-symbol">↺</div><div class="restore-copy"><span>ROBLOX PLAYBACKSPEED TO RESTORE ORIGINAL</span><strong id="restore-speed">1.00×</strong><small>Use this value on the Roblox Sound.PlaybackSpeed property.</small></div><button id="copy-restore" class="secondary-button compact" type="button">COPY VALUE</button></div>
+            <div class="process-row"><div class="process-note"><span class="tiny-spark">✦</span><span>Exports OGG Vorbis at 48 kHz</span></div><button id="process-button" class="primary-button" type="button" disabled><span class="button-spark">✦</span> PROCESS AUDIO <span class="button-arrow">→</span></button></div>
+            <div id="process-status" class="inline-status hidden" role="status"></div>
+            <div id="processed-result" class="processed-result hidden">
+              <div class="result-heading"><div><span class="success-kicker">✓ PROCESS COMPLETE</span><strong id="output-name">processed.ogg</strong><span id="output-meta">OGG Vorbis · 48 kHz</span></div><span class="pill pill-success">READY TO UPLOAD</span></div>
+              <audio id="processed-player" class="audio-player" controls preload="metadata"></audio>
+              <div class="result-actions"><button id="download-button" class="secondary-button" type="button">↓ DOWNLOAD .OGG</button><button id="upload-button" class="primary-button" type="button">UPLOAD TO ROBLOX <span class="button-arrow">→</span></button></div>
+            </div>
+          </div>
+
+          <aside class="right-column">
+            <section class="panel credentials-panel">
+              <div class="panel-heading"><div><div class="step-label"><span>02</span> ROBLOX CONNECTION</div><h2>API credentials</h2></div><span class="connection-icon">⌘</span></div>
+              <p class="panel-intro">Use a Roblox Open Cloud API key with <code>asset:write</code> and <code>asset:read</code> permissions.</p>
+              <div class="field-group"><label for="api-key">Open Cloud API key</label><div class="secret-input-wrap"><input id="api-key" type="password" autocomplete="off" placeholder="Paste your API key" spellcheck="false" /><button id="toggle-key" class="show-secret" type="button" aria-label="Show API key">SHOW</button></div></div>
+              <label class="remember-row"><input id="remember-key" type="checkbox" checked /><span class="custom-check"></span><span>Remember on this device</span></label>
+              <div class="field-grid"><div class="field-group"><label for="creator-type">Creator type</label><select id="creator-type"><option value="user">User account</option><option value="group">Group</option></select></div><div class="field-group"><label id="creator-id-label" for="creator-id">User ID</label><input id="creator-id" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 123456789" /></div></div>
+              <div class="field-group"><label for="asset-name">Asset name</label><input id="asset-name" type="text" maxlength="50" placeholder="My Roblox audio" value="My Roblox audio" /></div>
+              <div class="field-group"><label for="asset-description">Description <span class="optional-label">OPTIONAL</span></label><textarea id="asset-description" rows="2" maxlength="1000" placeholder="Add a short description…"></textarea></div>
+              <button id="verify-button" class="secondary-button full-button" type="button">TEST CONNECTION <span>↗</span></button>
+              <div id="api-status" class="api-status" role="status"><span class="status-indicator"></span><span>Enter your key and creator ID to connect.</span></div>
+              <div class="privacy-note"><span>⌑</span><p>Your key is sent to this Cloudflare Worker only when making a Roblox API request. It is not stored on the server. The “remember” option saves it locally in this browser.</p></div>
+            </section>
+            <section class="limits-card"><div class="limits-title"><span class="limits-icon">ⓘ</span><strong>Roblox audio requirements</strong></div><div class="limits-grid"><div><strong>20 MB</strong><span>Max file size</span></div><div><strong>&lt; 7 min</strong><span>Duration</span></div><div><strong>48 kHz</strong><span>Max sample rate</span></div></div><p>Upload limits and monthly quotas depend on your Roblox account verification status. Only upload audio you have the rights to use.</p><a href="https://create.roblox.com/docs/audio/assets" target="_blank" rel="noreferrer">Read Roblox audio requirements ↗</a></section>
+          </aside>
+        </section>
+
+        <section class="panel history-panel">
+          <div class="panel-heading history-heading"><div><div class="step-label"><span>03</span> UPLOAD MONITOR</div><h2>Upload history & moderation</h2><p>Roblox may finish processing before moderation is complete. Pending assets are checked again while this page is open.</p></div><button id="clear-history" class="text-button" type="button">CLEAR HISTORY</button></div>
+          <div id="history-list" class="history-list"><div class="history-empty"><span class="empty-icon">◌</span><strong>No uploads yet</strong><span>Your uploads and moderation status will appear here.</span></div></div>
+        </section>
+
+        <section class="footnote"><div class="footnote-icon">✳</div><div><strong>Built for creators, not shortcuts.</strong><p>SonicForge prepares audio and reports Roblox API responses; it cannot guarantee moderation approval or bypass Roblox copyright and Community Standards checks.</p></div><span class="footer-mark">SF / LAB 001</span></section>
+      </main>
+      <footer class="footer"><span>SONICFORGE AUDIO LAB</span><span>YOUR AUDIO STAYS IN YOUR BROWSER UNTIL YOU CHOOSE TO UPLOAD</span><span>© 2026</span></footer>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
